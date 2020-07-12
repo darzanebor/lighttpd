@@ -35,5 +35,5 @@ RUN chmod +x /docker-entrypoint.sh && \
     rm -rf /var/cache/apk/*
 WORKDIR /var/www
 USER lighttpd
-EXPOSE 80/tcp 443/tcp
+EXPOSE 8080/tcp 8443/tcp
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
