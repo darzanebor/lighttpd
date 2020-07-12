@@ -33,7 +33,7 @@ ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh && \
     rm -rf /var/cache/apk/*
-WORKDIR /var/www
-#USER lighttpd
 EXPOSE 8080/tcp 8443/tcp
+USER lighttpd
+WORKDIR /var/www
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
