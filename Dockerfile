@@ -1,4 +1,5 @@
 FROM alpine:3.11.5
+ENV LIGHTTPD_CONF=''
 RUN apk update && \
     apk add --no-cache nano lighttpd curl
 RUN apk add --no-cache lighttpd \
@@ -24,10 +25,24 @@ RUN apk add --no-cache lighttpd \
     fcgi && \
     mkdir /var/run/lighttpd /var/cache/lighttpd && \
     mkdir /var/cache/lighttpd/uploads
-RUN chown -R lighttpd:lighttpd /var/www /var/run/lighttpd /var/log/lighttpd /var/cache/lighttpd && \
+ADD error /var/www/error
+RUN chown -R lighttpd:lighttpd /var/www /var/run/lighttpd /var/cache/lighttpd && \
     chmod -R 550 /var/www && \
-    chmod -R 750 /var/log/lighttpd /var/cache/lighttpd /var/run/lighttpd && \
+    chmod -R 750 /var/cache/lighttpd /var/run/lighttpd && \
     rm -rf /var/www/localhost && \
+    rm -rf /var/cache/apk/* && \
+    sed -i -r 's|.*cgi.fix_pathinfo=.*|cgi.fix_pathinfo=1|g' /etc/php*/php.ini  && \
+    sed -i -r 's#.*safe_mode =.*#safe_mode = Off#g' /etc/php*/php.ini  && \
+    sed -i -r 's#.*expose_php =.*#expose_php = Off#g' /etc/php*/php.ini  && \
+    sed -i -r 's#memory_limit =.*#memory_limit = 536M#g' /etc/php*/php.ini  && \
+    sed -i -r 's#upload_max_filesize =.*#upload_max_filesize = 128M#g' /etc/php*/php.ini  && \
+    sed -i -r 's#post_max_size =.*#post_max_size = 256M#g' /etc/php*/php.ini  && \
+    sed -i -r 's#^file_uploads =.*#file_uploads = On#g' /etc/php*/php.ini  && \
+    sed -i -r 's#^max_file_uploads =.*#max_file_uploads = 12#g' /etc/php*/php.ini  && \
+    sed -i -r 's#^allow_url_fopen = .*#allow_url_fopen = On#g' /etc/php*/php.ini  && \
+    sed -i -r 's#^.default_charset =.*#default_charset = "UTF-8"#g' /etc/php*/php.ini  && \
+    sed -i -r 's#^.max_execution_time =.*#max_execution_time = 150#g' /etc/php*/php.ini  && \
+    sed -i -r 's#^max_input_time =.*#max_input_time = 90#g' /etc/php*/php.ini && \
     echo "Hello world!" > /var/www/index.html
 ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
 COPY docker-entrypoint.sh /

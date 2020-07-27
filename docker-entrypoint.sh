@@ -1,8 +1,9 @@
 #!/bin/sh
-config='/etc/lighttpd/lighttpd.conf'
+DEFAULT_CONF='/etc/lighttpd/lighttpd.conf'
+CONF="${LIGHTTPD_CONF:-$DEFAULT_CONF}"
 chown -R lighttpd:lighttpd /var/run/lighttpd /var/log/lighttpd /var/cache/lighttpd
-while [ ! -f $config ]
+while [ ! -f $CONF ]
 do
   sleep 5
 done
-lighttpd -D -f $config
+lighttpd -D -f $CONF
