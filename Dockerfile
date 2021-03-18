@@ -1,8 +1,7 @@
-FROM alpine:3.12
+FROM alpine:3.13
 ENV LIGHTTPD_CONF=''
 RUN apk update && \
-    apk add --no-cache nano lighttpd curl
-RUN apk add --no-cache lighttpd \
+    apk add --no-cache nano lighttpd curl \
     php7-common \
     php7-iconv \
     php7-json \
@@ -22,15 +21,11 @@ RUN apk add --no-cache lighttpd \
     php7-ldap \
     php7-ctype \
     php7-dom \
-    fcgi && \
-    mkdir /var/run/lighttpd /var/cache/lighttpd && \
-    mkdir /var/cache/lighttpd/uploads
+    fcgi
 ADD error /var/www/error
-RUN chown -R lighttpd:lighttpd /var/www /var/run/lighttpd /var/cache/lighttpd && \
-    chmod -R 550 /var/www && \
-    chmod -R 750 /var/cache/lighttpd /var/run/lighttpd && \
-    rm -rf /var/www/localhost && \
-    rm -rf /var/cache/apk/* && \
+RUN mkdir /run/lighttpd /var/cache/lighttpd /var/cache/lighttpd/uploads && \
+    chown -R lighttpd:lighttpd /etc/lighttpd /var/www /run/lighttpd /var/cache/lighttpd && \
+    chmod -R 750 /var/www /var/cache/lighttpd /run/lighttpd && \
     sed -i -r 's|.*cgi.fix_pathinfo=.*|cgi.fix_pathinfo=1|g' /etc/php*/php.ini  && \
     sed -i -r 's#.*safe_mode =.*#safe_mode = Off#g' /etc/php*/php.ini  && \
     sed -i -r 's#.*expose_php =.*#expose_php = Off#g' /etc/php*/php.ini  && \
@@ -47,8 +42,9 @@ RUN chown -R lighttpd:lighttpd /var/www /var/run/lighttpd /var/cache/lighttpd &&
 ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh && \
+    rm -rf /var/www/localhost && \
     rm -rf /var/cache/apk/*
+WORKDIR /var/www
 EXPOSE 8080/tcp 8443/tcp
 USER lighttpd
-WORKDIR /var/www
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
