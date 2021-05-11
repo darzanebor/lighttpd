@@ -23,7 +23,9 @@ RUN apk update && \
     php7-dom \
     fcgi
 ADD error /var/www/error
+ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
 RUN mkdir /run/lighttpd /var/cache/lighttpd /var/cache/lighttpd/uploads && \
+    echo "Hello world!" > /var/www/index.html && \
     chown -R lighttpd:lighttpd /etc/lighttpd /var/www /run/lighttpd /var/cache/lighttpd && \
     chmod -R 750 /var/www /var/cache/lighttpd /run/lighttpd && \
     sed -i -r 's|.*cgi.fix_pathinfo=.*|cgi.fix_pathinfo=1|g' /etc/php*/php.ini  && \
@@ -37,9 +39,7 @@ RUN mkdir /run/lighttpd /var/cache/lighttpd /var/cache/lighttpd/uploads && \
     sed -i -r 's#^allow_url_fopen = .*#allow_url_fopen = On#g' /etc/php*/php.ini  && \
     sed -i -r 's#^.default_charset =.*#default_charset = "UTF-8"#g' /etc/php*/php.ini  && \
     sed -i -r 's#^.max_execution_time =.*#max_execution_time = 150#g' /etc/php*/php.ini  && \
-    sed -i -r 's#^max_input_time =.*#max_input_time = 90#g' /etc/php*/php.ini && \
-    echo "Hello world!" > /var/www/index.html
-ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
+    sed -i -r 's#^max_input_time =.*#max_input_time = 90#g' /etc/php*/php.ini
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh && \
     rm -rf /var/www/localhost && \
