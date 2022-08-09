@@ -1,31 +1,27 @@
-FROM alpine:3.14
+FROM alphaceti/default-alpine:0.1.7
 ENV LIGHTTPD_CONF=''
-RUN apk update && \
-    apk add --no-cache nano lighttpd curl \
-    php7-common \
-    php7-iconv \
-    php7-json \
-    php7-gd \
-    php7-curl \
-    php7-xml \
-    php7-mysqli \
-    php7-imap \
-    php7-cgi \
-    php7-pdo \
-    php7-pdo_mysql \
-    php7-soap \
-    php7-xmlrpc \
-    php7-posix \
-    php7-mcrypt \
-    php7-gettext \
-    php7-ldap \
-    php7-ctype \
-    php7-dom \
+RUN apk add --update --no-cache \
+    lighttpd \
+    php8-common \
+    php8-iconv \
+    php8-json \
+    php8-gd \
+    php8-curl \
+    php8-xml \
+    php8-mysqli \
+    php8-imap \
+    php8-cgi \
+    php8-pdo \
+    php8-pdo_mysql \
+    php8-soap \
+    php8-posix \
+    php8-gettext \
+    php8-ldap \
+    php8-ctype \
+    php8-dom \
     fcgi
 ADD error /var/www/error
-ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
 RUN mkdir /run/lighttpd /var/cache/lighttpd /var/cache/lighttpd/uploads && \
-    echo "Hello world!" > /var/www/index.html && \
     chown -R lighttpd:lighttpd /etc/lighttpd /var/www /run/lighttpd /var/cache/lighttpd && \
     chmod -R 750 /var/www /var/cache/lighttpd /run/lighttpd && \
     sed -i -r 's|.*cgi.fix_pathinfo=.*|cgi.fix_pathinfo=1|g' /etc/php*/php.ini  && \
@@ -39,7 +35,9 @@ RUN mkdir /run/lighttpd /var/cache/lighttpd /var/cache/lighttpd/uploads && \
     sed -i -r 's#^allow_url_fopen = .*#allow_url_fopen = On#g' /etc/php*/php.ini  && \
     sed -i -r 's#^.default_charset =.*#default_charset = "UTF-8"#g' /etc/php*/php.ini  && \
     sed -i -r 's#^.max_execution_time =.*#max_execution_time = 150#g' /etc/php*/php.ini  && \
-    sed -i -r 's#^max_input_time =.*#max_input_time = 90#g' /etc/php*/php.ini
+    sed -i -r 's#^max_input_time =.*#max_input_time = 90#g' /etc/php*/php.ini && \
+    echo "Hello world!" > /var/www/index.html
+ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh && \
     rm -rf /var/www/localhost && \
